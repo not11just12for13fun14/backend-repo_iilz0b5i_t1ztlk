@@ -1,48 +1,35 @@
 """
-Database Schemas
+Database Schemas for University App
 
-Define your MongoDB collection schemas here using Pydantic models.
-These schemas are used for data validation in your application.
-
-Each Pydantic model represents a collection in your database.
-Model name is converted to lowercase for the collection name:
-- User -> "user" collection
-- Product -> "product" collection
-- BlogPost -> "blogs" collection
+Each Pydantic model represents a collection in MongoDB. The collection name
+is the lowercase of the class name (e.g., Class -> "class").
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 
-# Example schemas (replace with your own):
 
-class User(BaseModel):
-    """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
-    """
-    name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
+class Class(BaseModel):
+    code: str = Field(..., description="Unique class code, e.g., CS101")
+    name: str = Field(..., description="Class title")
+    instructor: str = Field(..., description="Instructor full name")
+    schedule: str = Field(..., description="When the class meets, e.g., Mon/Wed 10:00-11:15")
 
-class Product(BaseModel):
-    """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
-    """
-    title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+class Notification(BaseModel):
+    title: str = Field(..., description="Notification title")
+    body: str = Field(..., description="Notification content")
+    class_code: Optional[str] = Field(None, description="Optional class code if targeted to a specific class")
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+
+class Payment(BaseModel):
+    student_id: str = Field(..., description="Student identifier")
+    amount: float = Field(..., ge=0, description="Amount to be paid")
+    term: str = Field(..., description="Term/semester identifier, e.g., Fall 2025")
+    status: str = Field("pending", description="Payment status: pending, paid, failed")
+
+
+class Message(BaseModel):
+    class_code: str = Field(..., description="Class code to which this message belongs")
+    author: str = Field(..., description="Display name or student id of sender")
+    content: str = Field(..., description="Message text content")
